@@ -1,0 +1,51 @@
+$bgColor: hsl(0,0,92);
+
+html,body {
+  height: 100%;
+}
+
+body {
+  background: $bgColor;
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+}
+
+.scrollable {
+  max-width: 800px;
+  margin: 1em auto;
+  height:100%;
+  h1,h2,h3 {
+    text-align: center;
+    margin: 0;
+  }
+  h1 {
+    font-size: 3em;
+    font-weight: 100;
+    font-family: 'Pacifico';
+    line-height: 1em;
+    padding: 10% 0 0;
+  }
+  h2 {
+    font-family: 'Pacifico';
+    line-height: 1em;
+    padding: 5% 0 0;
+  }
+  h3 {
+    font-size: 1em;
+    padding: 20% 0 0;
+    font-weight: 100;
+  }
+  .tease {
+    text-align: center;
+    font-style: italic;
+    font-weight: 700;
+    padding: 70% 0 0;
+  }
+  .page {
+    position: relative;
+    height: 100%;
+    .mid {
+      margin-top: 45%;
+    }
+  }
+}

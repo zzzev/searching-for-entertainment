@@ -1,0 +1,18 @@
+{
+  "name": "american-pastime-winter-2018",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "pug source/* -o build/ && sass source:build && cp static/* build",
+    "watch-pug": "pug -w source/* -o build/",
+    "watch-sass": "sass --watch source:build"
+  },
+  "author": "zevyoura@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "livereload": "^0.7.0",
+    "pug": "^2.0.3",
+    "sass": "^1.15.3"
+  }
+}
