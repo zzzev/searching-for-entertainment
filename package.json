@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "pug source/* -o build/ && sass source:build && cp static/* build",
-    "watch-pug": "pug -w source/* -o build/",
-    "watch-sass": "sass --watch source:build"
+    "build": "pug source/* -o static/ && sass source:static",
+    "watch-pug": "pug -w source/* -o static/",
+    "watch-sass": "sass --watch source:static"
   },
   "author": "zevyoura@gmail.com",
   "license": "ISC",
