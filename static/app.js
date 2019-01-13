@@ -89,9 +89,9 @@ const bootstrap = async function bootstrap() {
       }
       
       if (index < lineStartStep || index === finalStep) {
-        c.hideLines();
+        ['netflix', 'meme'].forEach((id, index) => c.hideLine(id, Chart.duration, index * 250));
       } else {
-        c.showLines();
+        ['netflix', 'meme'].forEach((id, index) => c.showLine(id, Chart.duration, index * 250));
       }
 
       if (index < weekendShadeStep || index > weekendShadeStep + 1 || index === finalStep) {
@@ -101,9 +101,9 @@ const bootstrap = async function bootstrap() {
       }
 
       if (index < birdBoxStep || index === finalStep) {
-        c.hideBirdBox();
+        ['birdbox', 'aquaman'].forEach((id, index) => c.hideLine(id, Chart.duration, index * 250));
       } else {
-        c.showBirdBox();
+        ['birdbox', 'aquaman'].forEach((id, index) => c.showLine(id, Chart.duration, index * 250));
       }
     })
     .onStepProgress(({element, index, progress}) => {

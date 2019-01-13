@@ -9,6 +9,8 @@ const Chart = class Chart {
       .attr('width', this.width)
       .attr('height', this.height);
 
+    const trends = Object.keys(data[0]).slice(0, -1);
+
     // scales
     const dayExtent = d3.extent(data, d => d.day);
     
@@ -23,20 +25,16 @@ const Chart = class Chart {
     this.color = d3.scaleOrdinal(d3.schemeCategory10);
 
     // clip paths
-    this.clip = this.svg.append('clipPath')
-      .attr('id', Chart.clipId)
-      .append('rect')
-        .attr('x', this.x(dayExtent[0]))
-        .attr('width', 0)
-        .attr('y', this.y(100))
-        .attr('height', this.y(0) - this.y(100));
-    this.clipBB = this.svg.append('clipPath')
-      .attr('id', Chart.clipBBId)
-      .append('rect')
-        .attr('x', this.x(dayExtent[0]))
-        .attr('width', 0)
-        .attr('y', this.y(100))
-        .attr('height', this.y(0) - this.y(100));  
+    // note: use a foreach loop because data binding doesn't work w/ clipPath elements
+    trends.forEach(d => {
+      this.svg.append('clipPath')
+        .attr('id', `clip-${d}`)
+        .append('rect')
+          .attr('x', this.x(dayExtent[0]))
+          .attr('width', 0)
+          .attr('y', this.y(100))
+          .attr('height', this.y(0) - this.y(100));
+    });
 
     // axis
     this.axis = this.svg.append('g')
@@ -48,7 +46,7 @@ const Chart = class Chart {
     // lines
     const lines = this.svg.append('g')
       .classed('lines', true);
-    this.updateLineCallbacks = Object.keys(data[0]).slice(0, -1).map(t => {
+    this.updateLineCallbacks = trends.map(t => {
       const line = d3.line()
         .x(d => this.x(d.day))
         .y(d => d[t] === "<1" ? this.y(0) : this.y(d[t]));
@@ -57,11 +55,9 @@ const Chart = class Chart {
         .append('path')
           .attr('d', line)
           .attr('stroke', this.color(t))
-          .attr('clip-path', `url(#${t === "bird box" ? Chart.clipBBId : Chart.clipId})`);
+          .attr('clip-path', `url(#clip-${t})`);
       return () => l.attr('d', line);
     });
-
-
   }
 
   updateChart() {
@@ -106,36 +102,23 @@ const Chart = class Chart {
       .attr('opacity', 0);
   }
 
-  showLines() {
+  showLine(id, duration = Chart.duration, delay = 0) {
     const range = this.x.range();
-    this.clip
+    this.svg
+      .select(`#clip-${id} rect`)
       .transition()
-      .duration(Chart.duration)
+      .duration(duration)
+      .delay(delay)
       .attr('x', range[0])
       .attr('width', range[1] - range[0]);
   }
 
-  hideLines() {
-    this.clip
+  hideLine(id, duration = Chart.duration, delay = 0) {
+    this.svg
+      .select(`#clip-${id} rect`)
       .transition()
-      .duration(Chart.duration)
-      .attr('x', this.x.range()[0])
-      .attr('width', 0);
-  }
-
-  showBirdBox() {
-    const range = this.x.range();
-    this.clipBB
-      .transition()
-      .duration(Chart.duration * 2)
-      .attr('x', range[0])
-      .attr('width', range[1] - range[0]);
-  }
-
-  hideBirdBox() {
-    this.clipBB
-      .transition()
-      .duration(Chart.duration)
+      .duration(duration)
+      .delay(delay)
       .attr('x', this.x.range()[0])
       .attr('width', 0);
   }
@@ -175,8 +158,6 @@ Chart.margin = {
 };
 Chart.daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 Chart.isWeekend = [false, false, false, false, false, true, true];
-Chart.clipId = 'clip';
-Chart.clipBBId = 'bbclip';
 Chart.msPerDay = 1000 * 60 * 60 * 24;
 Chart.duration = 2000;
 
