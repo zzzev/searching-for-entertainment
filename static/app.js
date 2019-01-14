@@ -7,7 +7,8 @@ const lineStartStep = scrollStartStep + 1;
 const weekendShadeStep = 4;
 const scrollingSteps = 5;
 const birdBoxStep = 6;
-const finalStep = 8;
+const aquamanStep = 8;
+const finalStep = 9;
 
 const headline = "Searching for Entertainment"
 
@@ -88,7 +89,7 @@ const bootstrap = async function bootstrap() {
         c.showAxis();
       }
       
-      if (index < lineStartStep || index === finalStep) {
+      if (index < lineStartStep || index >= aquamanStep) {
         ['netflix', 'meme'].forEach((id, index) => c.hideLine(id, Chart.duration, index * 250));
       } else {
         ['netflix', 'meme'].forEach((id, index) => c.showLine(id, Chart.duration, index * 250));
@@ -101,9 +102,21 @@ const bootstrap = async function bootstrap() {
       }
 
       if (index < birdBoxStep || index === finalStep) {
-        ['birdbox', 'aquaman'].forEach((id, index) => c.hideLine(id, Chart.duration, index * 250));
+        c.hideLine('birdbox');
+      } else {    
+        c.showLine('birdbox');
+      }
+
+      if (index < aquamanStep || index === finalStep) {
+        c.hideLine('aquaman');
       } else {
-        ['birdbox', 'aquaman'].forEach((id, index) => c.showLine(id, Chart.duration, index * 250));
+        c.showLine('aquaman');
+      }
+
+      if (index < weekendShadeStep || index === finalStep) {
+        c.hideHolidays();
+      } else {
+        c.showHolidays();
       }
     })
     .onStepProgress(({element, index, progress}) => {

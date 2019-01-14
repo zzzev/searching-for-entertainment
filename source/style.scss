@@ -1,3 +1,7 @@
+$scheme0: #1f77b4;
+$scheme1: #ff7f0e;
+$scheme2: #2ca02c;
+$scheme3: #d62728;
 $bgColor: hsl(0,0,92);
 
 html,body {
@@ -57,7 +61,7 @@ body {
   }
   .page {
     position: relative;
-    height: 60em;
+    height: 80em;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -95,17 +99,22 @@ body {
 }
 
 .netflix {
-  color: #1f77b4;
+  color: $scheme3;
   font-weight: 900;
 }
 
 .meme {
-  color: #ff7f0e;
+  color: $scheme2;
   font-weight: 900;
 }
 
 .birdbox {
-  color: #2ca02c;
+  color: $scheme1;
+  font-weight: 900;
+}
+
+.aquaman {
+  color: $scheme0;
   font-weight: 900;
 }
 
@@ -149,4 +158,9 @@ body {
 
 .italic {
   font-style: italic;
+}
+
+.holidays {
+  font-weight: 400;
+  font-family: apple color emoji,segoe ui emoji,noto color emoji,android emoji,emojisymbols,emojione mozilla,twemoji mozilla,segoe ui symbol;
 }

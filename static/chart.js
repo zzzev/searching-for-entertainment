@@ -1,3 +1,18 @@
+const getEmoji = d => {
+  const month = d.day.getMonth();
+  const dayOfMonth = d.day.getDate();
+  if (month === 10 && dayOfMonth === 22) {
+    return '🦃';
+  }
+  if (month === 11 && dayOfMonth === 25) {
+    return '🎅';
+  }
+  if (month === 11 && dayOfMonth === 31) {
+    return '🍾';
+  }
+  return '';
+}
+
 const Chart = class Chart {
   constructor(d3, data) {
     this.d3 = d3;
@@ -22,7 +37,7 @@ const Chart = class Chart {
     this.y = d3.scaleLinear()
       .domain([0, 100])
       .range([this.height - Chart.margin.bottom, Chart.margin.top]);  
-    this.color = d3.scaleOrdinal(d3.schemeCategory10);
+    this.color = d3.scaleOrdinal([3, 2, 1, 0].map(i => d3.schemeCategory10[i]));
 
     // clip paths
     // note: use a foreach loop because data binding doesn't work w/ clipPath elements
@@ -35,6 +50,16 @@ const Chart = class Chart {
           .attr('y', this.y(100))
           .attr('height', this.y(0) - this.y(100));
     });
+    // margin clipper
+    const xRange = this.x.range();
+    const yRange = this.y.range();
+    this.svg.append('clipPath')
+      .attr('id', Chart.clipMarginId)
+      .append('rect')
+      .attr('x', xRange[0])
+      .attr('width', xRange[1] - xRange[0])
+      .attr('y', yRange[1])
+      .attr('height', yRange[0] - yRange[1]);
 
     // axis
     this.axis = this.svg.append('g')
@@ -42,6 +67,7 @@ const Chart = class Chart {
       .call(d3.axisBottom(this.x).ticks(d3.timeWeek.every(1)))
       .attr('opacity', 0);
     this.drawDayOfWeek();
+    this.drawHolidays();
 
     // lines
     const lines = this.svg.append('g')
@@ -65,14 +91,32 @@ const Chart = class Chart {
       .call(this.d3.axisBottom(this.x).ticks(this.d3.timeWeek.every(1)));
     this.updateLineCallbacks.forEach(cb => cb());
     this.dayOfWeekG.attr('transform', d => `translate(${this.x(d.day)}, 0)`);
+    this.holidayG.attr('transform', d => `translate(${this.x(d.day)}, 0)`);
+  }
+
+  drawHolidays() {
+    this.holidays = this.svg.append('g')
+      .classed('holidays', true)
+      .attr('opacity', 1)
+      .attr('clip-path', `url(#${Chart.clipMarginId})`);
+    this.holidayG = this.holidays.selectAll('g')
+      .data(this.data.filter(d => getEmoji(d) !== '')).enter().append('g')
+      .attr('transform', d => `translate(${this.x(d.day)}, 0)`)
+    this.holidayG
+      .append('text')
+        .text(getEmoji)
+        .attr('font-size', 20)
+        .attr('fill', d => Chart.isWeekend[d.day.getDay()] ? 'white' : 'grey')
+        .attr('text-anchor', 'middle')
+        .attr('y', this.height - Chart.margin.bottom - 20);
   }
 
   drawDayOfWeek() {
-    this.daysOfWeek = this.svg.append('g').classed('days', true);
+    this.daysOfWeek = this.svg.append('g').classed('days', true)
+      .attr('clip-path', `url(#${Chart.clipMarginId})`);
     this.dayOfWeekG = this.daysOfWeek.selectAll('g')
       .data(this.data).enter().append('g')
       .attr('transform', d => `translate(${this.x(d.day)}, 0)`);
-    const xDomain = this.x.domain();
     const yRange = this.y.range();
     this.dayOfWeekG.append('rect')
       .attr('x', d => this.x(d.day.getTime() - Chart.msPerDay / 2) - this.x(d.day.getTime()))
@@ -81,7 +125,7 @@ const Chart = class Chart {
       .attr('height', yRange[0] - yRange[1])
       .attr('fill', d => Chart.isWeekend[d.day.getDay()] ? 'rgba(0,0,0,0.2)' : 'none');
     this.dayOfWeekG.append('text')
-      .text(d => Chart.daysOfWeek[d.day.getDay()])
+      .text(d => getEmoji(d) === '' ? Chart.daysOfWeek[d.day.getDay()] : '')
       .attr('font-size', 10)
       .attr('fill', d => Chart.isWeekend[d.day.getDay()] ? 'white' : 'grey')
       .attr('text-anchor', 'middle')
@@ -123,6 +167,20 @@ const Chart = class Chart {
       .attr('width', 0);
   }
 
+  showHolidays() {
+    this.holidays
+      .transition()
+      .duration(Chart.duration)
+      .attr('opacity', 1)
+  }
+
+  hideHolidays() {
+    this.holidays
+      .transition()
+      .duration(Chart.duration)
+      .attr('opacity', 0)
+  }
+
   showWeekendShading() {
     this.daysOfWeek
       .transition()
@@ -160,5 +218,6 @@ Chart.daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 Chart.isWeekend = [false, false, false, false, false, true, true];
 Chart.msPerDay = 1000 * 60 * 60 * 24;
 Chart.duration = 2000;
+Chart.clipMarginId = 'clip-margin'
 
 export default Chart;
