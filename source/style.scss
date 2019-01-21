@@ -17,8 +17,6 @@ body {
 .scrollable {
   max-width: 800px;
   margin: 0 auto;
-  height:100%;
-  position: relative;
 
   .headline {
     width: 100%;
@@ -33,11 +31,9 @@ body {
     font-weight: 900;
     line-height: 1em;
     font-size: 1.5em;
-    padding: 5% 0 0;
   }
   h3 {
     font-size: 1em;
-    padding: 10% 0 0;
     font-weight: 100;
     a {
       font-weight: 900;
@@ -53,15 +49,13 @@ body {
   .tease {
     font-weight: 700;
     display: inline-flex;
-    margin-top: 30%;
     padding: 1em;
     border-radius: 3px;
-    background: hsla(0,0,100,0.75);
+    background: hsla(0,0,100,0.9);
     cursor: default;
   }
   .page {
-    position: relative;
-    height: 80em;
+    height: 1000px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -127,6 +121,7 @@ body {
 }
 
 #splash {
+  z-index: -1;
   position: absolute;
   top: 0;
   left: 0;
