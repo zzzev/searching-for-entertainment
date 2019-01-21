@@ -28,6 +28,7 @@ body {
     color: white;
   }
   h2 {
+    margin-top: 10%;
     font-weight: 900;
     line-height: 1em;
     font-size: 1.5em;
@@ -47,6 +48,7 @@ body {
     }
   }
   .tease {
+    margin-top: 20%;
     font-weight: 700;
     display: inline-flex;
     padding: 1em;
@@ -79,7 +81,7 @@ body {
   margin: 1em;
   padding: 1em;
   border-radius: 3px;
-  background: hsla(0,0,100,0.85);
+  background: hsla(0,0,100,0.95);
   line-height: 1.5em;
   cursor: default;
 
@@ -114,6 +116,7 @@ body {
 
 #chart {
   position: fixed;
+  z-index: -2;
   .lines path {
     fill: none;
     stroke-width: 5px;

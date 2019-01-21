@@ -12,6 +12,7 @@ const finalStep = 9;
 
 const headline = "Searching for Entertainment"
 
+// Animate the input box in the splash screen area.
 const splash = function splash(d3) {
   const input = d3.select(".page input")
     .attr('value', '')
@@ -27,9 +28,6 @@ const splash = function splash(d3) {
         newValue = current.slice(0, -1);
       }
       input.attr('value', newValue);
-      // const node = input.node();
-      // node.setSelectionRange(newValue.length, newValue.length);
-      // node.focus();
       if (newValue.length === headline.length) {
         d3.timeout(scheduleDelete, 2000);
       } else {
@@ -41,9 +39,6 @@ const splash = function splash(d3) {
     d3.timeout(() => {
       const newValue = input.attr('value').slice(0, -1);
       input.attr('value', newValue);
-      // const node = input.node();
-      // node.setSelectionRange(newValue.length, newValue.length);
-      // node.focus();
       if (newValue.length > 0) {
         scheduleDelete();
       } else {
@@ -54,6 +49,7 @@ const splash = function splash(d3) {
   scheduleKeystroke();
 }
 
+// Initial set up (event listeners, height, etc.)
 const bootstrap = async function bootstrap() {
   const results = await Promise.all([
     require('d3'),
@@ -74,57 +70,69 @@ const bootstrap = async function bootstrap() {
 
   splash(d3);
 
+  const pageHeight = Math.max(window.innerHeight, 1000);
+  const numPages = d3.selectAll('.page')
+    .style('height', `${pageHeight}px`)
+    .nodes().length;
+
   const c = new Chart(d3, data);
 
-  const scroller = scrollama();
-  scroller
-    .setup({
-      step: '.page',
-      progress: true
-    }) 
-    .onStepEnter(({element, index}) => {
-      if (index < scrollStartStep || index === finalStep) {
-        c.hideAxis();
-      } else {
-        c.showAxis();
-      }
-      
-      if (index < lineStartStep || index >= aquamanStep) {
-        ['netflix', 'meme'].forEach((id, index) => c.hideLine(id, Chart.duration, index * 250));
-      } else {
-        ['netflix', 'meme'].forEach((id, index) => c.showLine(id, Chart.duration, index * 250));
-      }
+  let lastIndex = 0;
 
-      if (index < weekendShadeStep || index > weekendShadeStep + 1 || index === finalStep) {
-        c.hideWeekendShading();
-      } else {
-        c.showWeekendShading();
-      }
+  const onIndexChange = (index) => {
+    if (index < scrollStartStep || index === finalStep) {
+      c.hideAxis();
+    } else {
+      c.showAxis();
+    }
+    
+    if (index < lineStartStep || index >= aquamanStep) {
+      ['netflix', 'meme'].forEach((id, index) => c.hideLine(id, Chart.duration, index * 250));
+    } else {
+      ['netflix', 'meme'].forEach((id, index) => c.showLine(id, Chart.duration, index * 250));
+    }
 
-      if (index < birdBoxStep || index === finalStep) {
-        c.hideLine('birdbox');
-      } else {    
-        c.showLine('birdbox');
-      }
+    if (index < weekendShadeStep || index > weekendShadeStep + 1 || index === finalStep) {
+      c.hideWeekendShading();
+    } else {
+      c.showWeekendShading();
+    }
 
-      if (index < aquamanStep || index === finalStep) {
-        c.hideLine('aquaman');
-      } else {
-        c.showLine('aquaman');
-      }
+    if (index < birdBoxStep || index === finalStep) {
+      c.hideLine('birdbox');
+    } else {    
+      c.showLine('birdbox');
+    }
 
-      if (index < weekendShadeStep || index === finalStep) {
-        c.hideHolidays();
-      } else {
-        c.showHolidays();
-      }
-    })
-    .onStepProgress(({element, index, progress}) => {
-      console.log(index, progress);
-      if (index >= scrollStartStep) {
-        c.updateNow(progress / scrollingSteps + ((index - scrollStartStep) / scrollingSteps));
-      }
-    });
+    if (index < aquamanStep || index === finalStep) {
+      c.hideLine('aquaman');
+    } else {
+      c.showLine('aquaman');
+    }
+
+    if (index < weekendShadeStep || index === finalStep) {
+      c.hideHolidays();
+    } else {
+      c.showHolidays();
+    }
+  }
+
+  onIndexChange(lastIndex);
+
+  window.addEventListener('scroll', function onScroll(e) {
+    const middle = window.scrollY + window.innerHeight / 2;
+    const progress = middle / pageHeight;
+    const pageIndex = Math.floor(progress);
+    const pageProgress = progress - pageIndex;
+    if (pageIndex !== lastIndex) {
+      onIndexChange(pageIndex);
+      lastIndex = pageIndex;
+    }
+    if (pageIndex >= scrollStartStep) {
+      const scrollProgress = pageProgress / scrollingSteps + ((pageIndex - scrollStartStep) / scrollingSteps);
+      c.updateNow(scrollProgress);
+    }
+  });
 }
 
 bootstrap();
